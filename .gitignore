@@ -1,0 +1,8 @@
+.pio/
+.travis.yml
+.vscode/
+lib/
+include/
+fritzing/
+test/
+#src/config/config.h
