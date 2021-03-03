@@ -2,7 +2,7 @@
 
 ## Overview
 
-This ESP32 sensor is setup to wake from deep sleep every 5 minutes, take a sensor reading, send the data to MQTT, and go back to sleep.  Intended for dark rooms, the OLED is only activate for about 10 seconds by tapping the touch sensor on the top.  The number in the lower-right corner is the signal strength.  Update settings in src/config/config.h.
+This ESP32 sensor is setup to wake from deep sleep every 5 minutes, take a sensor reading, send the data to MQTT, and go back to sleep.  Intended for dark rooms, the OLED is only activated for about 10 seconds by tapping the touch sensor on the top.  The number in the lower-right corner is the signal strength.  Update settings in src/config/config.h.
 
 ![project photo](/img/ESP32-station-oled.jpg)
 
@@ -14,7 +14,7 @@ The 30-pin ESP32 board with integrated antenna slides perfectly into the rail.
 
 ![back](/img/ESP32-station-back.jpg)
 
-The cover hooks into the top edge and the bottom can stay pressed in.  I didn't need to add screws.  I modified the cover so the wires for the BME280 can be external.  I'd like to further tweak the cover to hold the sensor.
+The cover hooks into the top edge and the bottom can stay pressed in.  I didn't need to add screws.  I modified the cover with a small cutout at the top so the BME280 sensor can be external.  I'd like to further tweak the cover to better hold the sensor.
 
 ## Parts
 
