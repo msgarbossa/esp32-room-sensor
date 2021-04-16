@@ -7,6 +7,7 @@
 
 #include "config/config.h"
 #include "functions/wifi-connection.h"
+#include "functions/ota.h"
 #include "functions/deep-sleep.h"
 #include "functions/temp-bme280.h"
 #include "functions/mqtt.h"
@@ -25,14 +26,12 @@ extern char *__brkval;
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+RTC_DATA_ATTR int bootCount = 0;
 float temp;
 float humidity;
 float pressure;
 int8_t wifi_strength;
 
-// sensitivity for the tocuh sensor
-// greater number for more sensitivity (40 seems to work good)
-#define Threshold 40
 esp_sleep_wakeup_cause_t wakeup_reason;
 
 #define I2C_SDA 21
@@ -93,18 +92,17 @@ void setup() {
 
   Serial.begin(115200);
 
+  //Increment boot number and print it every reboot
+  ++bootCount;
+  Serial.println("Boot number: " + String(bootCount));
+
   setup_sleep();
   Wire.begin(I2C_SDA, I2C_SCL);
 
   setupTemp();
   measureTemp();
 
-  connectWiFi();
-  updateWiFiSignalStrength();
-  mqttConnect();
-  sendTempToMQTT();
-
-  // When waking up from touch sensor
+  // Display stats waking up from touch sensor
   if (wakeup_reason == 5) {
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
@@ -112,21 +110,46 @@ void setup() {
       for(;;); // Don't proceed, loop forever
     }
     displayStats();
-    delay(9000); // Pause for 10 second
-    display.clearDisplay();
-    display.display();
-    delay(1000); // Pause for 1 second
   }
 
-  //Setup interrupt on Touch Pad 3 (GPIO15)
+  connectWiFi();
+  updateWiFiSignalStrength();
+  mqttConnect();
+  sendTempToMQTT();
+  mqttDisconnect();
+
+  // When wakeing up from sensor, update stats to show wifi strength.
+  // Then pause long enough for stats to be read.
+  if (wakeup_reason == 5) {
+    displayStats();
+    delay(7000); // Pause for 10 second
+    display.clearDisplay();
+    display.display();
+  }
+
+  // Setup interrupt on Touch Pad 3 (GPIO15)
   touchAttachInterrupt(T3, callback, Threshold);
 
-  //Configure Touchpad as wakeup source
+  // Configure Touchpad as wakeup source
   esp_sleep_enable_touchpad_wakeup();
+
+  // Check OTA update on first boot
+  if (bootCount == 1) {
+    setupOTA();
+    delay(2000);
+    // takes a few attempts.  worked on count=11 (2s each)
+    unsigned short maxRetry = 20;
+    unsigned short countRetry = 0;
+    while(countRetry <= maxRetry) {
+        Serial.println("[OTA] count: " + String(countRetry));
+        countRetry++;
+        ArduinoOTA.handle();
+        delay(2000);
+    }
+  }
 
   deep_sleep();
 }
 
 void loop() {
-  // ArduinoOTA.handle();
 }
