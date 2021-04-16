@@ -27,7 +27,8 @@ void mqttConnect() {
 
     long startAttemptTime = millis();
 
-    while (!MQTT_client.connect(DEVICE_NAME, MQTT_USER, MQTT_PASSWORD) &&
+    // while (!MQTT_client.connect(DEVICE_NAME, MQTT_USER, MQTT_PASSWORD) &&
+    while (!MQTT_client.connect(DEVICE_NAME, MQTT_USER, MQTT_PASSWORD, "home/" DEVICE_NAME "/will", 0, false, "unexpected exit", true) &&
         millis() - startAttemptTime < MQTT_CONNECT_TIMEOUT) {
         delay(MQTT_CONNECT_DELAY);
     }
@@ -44,12 +45,12 @@ void mqttConnect() {
 void sendTempToMQTT(){
 
     if(!MQTT_client.connected()){
-        Serial.println(F("[MQTT] Connection failed for temperature."));
+        Serial.println("[MQTT] Connection failed for temperature.");
         return;
     }
 
     if(!MQTT_client.connected()){
-        Serial.println(F("[MQTT] Can't send to HA without MQTT. Abort."));
+        Serial.println("[MQTT] Can't send to HA without MQTT. Abort.");
         return;
     }
 
@@ -57,10 +58,18 @@ void sendTempToMQTT(){
     char msg[50];
     sprintf(msg, "{\"t\":\"%0.2f\",\"h\":\"%0.2f\",\"p\":\"%0.2f\",\"s\":\"%d\"}", temp, humidity, pressure, wifi_strength);
 
-    Serial.print(F("[MQTT] HA publish: "));
+    Serial.print("[MQTT] HA publish: ");
     Serial.println(msg);
 
-    MQTT_client.publish("home/" DEVICE_NAME "/temp", msg);
+    MQTT_client.publish("home/" DEVICE_NAME "/metrics", msg);
+}
+
+void mqttDisconnect() {
+    if(MQTT_client.connected()){
+        Serial.println("[MQTT] Aborting disconnect.  Already disconnected.");
+        return;
+    }
+    MQTT_client.disconnect();
 }
 
 #endif
