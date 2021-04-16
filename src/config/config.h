@@ -2,7 +2,7 @@
 #ifndef CONFIG
 #define CONFIG
 
-#define DEVICE_NAME "room1"
+#define DEVICE_NAME "room3"
 
 // How often to wake up from deep sleep
 #define TIME_TO_SLEEP_SEC 300
@@ -20,5 +20,13 @@
 #define MQTT_PASSWORD "password"
 #define MQTT_CONNECT_DELAY 200
 #define MQTT_CONNECT_TIMEOUT 10000 // 10 seconds
+
+// sensitivity for the touch sensor
+// greater number for more sensitivity
+// too low and wakeup will not work
+// too high and wakeup will occur in an infinite loop
+// somewhere between 50 and 80 seems to work
+#define Threshold 50
+
 
 #endif
