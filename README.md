@@ -32,7 +32,7 @@ The cover hooks into the top edge and the bottom can stay pressed in.  I didn't 
 ![Node-RED flow](/node-red/node-red-flow.png)
 [JSON for above flow](node-red/flow.json)
 
-The beginnig of the flow starts out very simple.  Node-RED listens on the MQTT topic for the sensor.  The messages get converted from JSON to payload objects.
+The beginning of the flow starts out very simple.  Node-RED listens on the MQTT topic for the sensor.  The messages get converted from JSON to payload objects.
 
 To understand the rest of the flow, it's important to go over how the Prometheus node exporter works in Node-RED.  The orange metric boxes to the right-side of the flow generate the prometheus data shown below at \<node_red_url\>:1880/metrics.
 
